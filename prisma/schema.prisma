@@ -16,6 +16,12 @@ model User {
     phone        String?
     birthDate    DateTime?
     createdAt    DateTime  @default(now())
+    role         RoLe      @default(USER)
+}
+
+enum RoLe {
+    USER
+    ADMIN
 }
 
 model Product {
