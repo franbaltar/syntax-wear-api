@@ -22,14 +22,13 @@ export default async function authRoutes(fastify: FastifyInstance) {
             },
             email: {
               type: "string",
-              format: "email",
+
               description: "Email do usuário",
             },
             password: {
               type: "string",
-              format: "password",
+
               description: "Senha do usuário",
-              minLength: 8,
             },
             cpf: {
               type: "string",
@@ -37,7 +36,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             },
             birthDate: {
               type: "string",
-              format: "date",
+
               description: "Data de nascimento no formato YYYY-MM-DD",
             },
             phone: {
@@ -63,7 +62,6 @@ export default async function authRoutes(fastify: FastifyInstance) {
           properties: {
             email: {
               type: "string",
-              format: "email",
               description: "Email do usuário",
             },
             password: {
