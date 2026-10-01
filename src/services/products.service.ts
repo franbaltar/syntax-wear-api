@@ -1,6 +1,7 @@
 import { prisma } from "../utils/prisma";
-import { CreateProduct, ProductFilters } from "../types";
+import { CreateProduct, ProductFilters, UpdateProduct } from "../types";
 import { Prisma } from "@prisma/client";
+import { ConflictError } from "../../src/utils/errors";
 
 export const getProducts = async (filter: ProductFilters) => {
   const {
@@ -71,4 +72,45 @@ export const createProduct = async (data: CreateProduct) => {
     data,
   });
   return newProduct;
+};
+
+export const updateProduct = async (id: number, data: UpdateProduct) => {
+  const existingProduct = await prisma.product.findUnique({
+    where: { id },
+  });
+
+  if (!existingProduct) {
+    throw new Error("Produto não encontrado");
+  }
+
+  if (data.name) {
+    const productWithSameName = await prisma.product.findFirst({
+      where: {
+        name: { equals: data.name.trim(), mode: "insensitive" },
+        id: { not: id },
+      },
+    });
+
+    if (productWithSameName) {
+      throw new ConflictError("Já existe um produto com este nome.");
+    }
+  }
+
+  if (data.slug) {
+    const slugExists = await prisma.product.findUnique({
+      where: { slug: data.slug },
+    });
+
+    if (slugExists && slugExists.id !== id) {
+      throw new ConflictError(
+        "Produto com este slug já existe. Escolha outro nome para o produto.",
+      );
+    }
+  }
+
+  const updatedProduct = await prisma.product.update({
+    where: { id },
+    data,
+  });
+  return updatedProduct;
 };

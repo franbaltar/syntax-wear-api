@@ -1,11 +1,16 @@
 import { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 import z, { ZodError } from "zod";
+import { ConflictError } from "../utils/errors";
 
 export const setErrorHandler = (
   error: FastifyError,
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
+  if (error instanceof ConflictError) {
+    return reply.status(error.statusCode).send({ message: error.message });
+  }
+
   if (error instanceof ZodError) {
     return reply.status(400).send({
       message: "Erro de validação (zod)",
