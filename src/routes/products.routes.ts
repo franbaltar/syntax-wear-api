@@ -1,10 +1,12 @@
 import { FastifyInstance } from "fastify";
 import {
   createNewProduct,
+  deleteExistingProduct,
   getProduct,
   listProducts,
   updateExistingProduct,
 } from "../controllers/products.controller";
+import { authenticate } from "../middlewares/auth.middleware";
 
 export default async function productRoutes(fastify: FastifyInstance) {
   // fastify.addHook("onRequest", authenticate);
@@ -164,6 +166,34 @@ export default async function productRoutes(fastify: FastifyInstance) {
       },
     },
     updateExistingProduct,
+  );
+
+  fastify.delete(
+    "/:id",
+    {
+      schema: {
+        tags: ["Products"],
+        description: "Deleta um produto pelo ID",
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "number" },
+          },
+          required: ["id"],
+        },
+        response: {
+          200: {
+            description: "Produto deletado com sucesso",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+            required: ["message"],
+          },
+        },
+      },
+    },
+    deleteExistingProduct,
   );
 
   fastify.post(

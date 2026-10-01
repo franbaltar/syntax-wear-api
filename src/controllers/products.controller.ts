@@ -2,11 +2,16 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { CreateProduct, ProductFilters } from "../types";
 import {
   createProduct,
+  deleteProduct,
   getProductById,
   getProducts,
   updateProduct,
 } from "../services/products.service";
-import { createProductSchema, updateProductSchema } from "../utils/validators";
+import {
+  createProductSchema,
+  deleteProductSchema,
+  updateProductSchema,
+} from "../utils/validators";
 import slugify from "slugify";
 
 export const listProducts = async (
@@ -58,4 +63,17 @@ export const updateExistingProduct = async (
   }
   const product = await updateProduct(Number(id), validate);
   reply.status(200).send(product);
+};
+
+export const deleteExistingProduct = async (
+  request: FastifyRequest<{ Params: { id: number } }>,
+  reply: FastifyReply,
+) => {
+  const { id } = request.params;
+
+  const validate = deleteProductSchema.parse({ id });
+  await deleteProduct(validate.id);
+  reply
+    .status(200)
+    .send({ message: "Produto deletado com sucesso! (soft delete)" });
 };
