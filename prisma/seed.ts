@@ -122,11 +122,26 @@ const products = [
 ];
 
 async function main() {
+  const defaultCategory = await prisma.category.upsert({
+    where: { slug: "sem-categoria" },
+    update: {},
+    create: {
+      name: "Sem categoria",
+      slug: "sem-categoria",
+    },
+  });
+
   for (const product of products) {
     await prisma.product.upsert({
       where: { slug: product.slug },
-      update: product,
-      create: product,
+      update: {
+        ...product,
+        category: { connect: { id: defaultCategory.id } },
+      },
+      create: {
+        ...product,
+        category: { connect: { id: defaultCategory.id } },
+      },
     });
   }
 

@@ -36,4 +36,16 @@ model Product {
     sizes       Json?
     stock       Int      @default(0)
     active      Boolean  @default(true)
+    categoryId  Int
+    category    Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+    @@index([categoryId])
+}
+
+model Category {
+    id          Int       @id @default(autoincrement())
+    name        String
+    slug        String    @unique
+    description String?
+    products    Product[]
 }

@@ -40,3 +40,9 @@ coverage/
 
 # Prisma
 prisma/migrations/
+!prisma/migrations/
+prisma/migrations/*
+!prisma/migrations/20261002000000_add_categories/
+!prisma/migrations/20261002000000_add_categories/migration.sql
+!prisma/migrations/20261002160000_add_product_category_index/
+!prisma/migrations/20261002160000_add_product_category_index/migration.sql
