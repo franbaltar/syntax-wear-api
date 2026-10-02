@@ -7,6 +7,51 @@ const adapter = new PrismaPg({
 });
 const prisma = new PrismaClient({ adapter });
 
+const categories = [
+  {
+    name: "Camisetas",
+    slug: "camisetas",
+    description: "Camisetas casuais para o dia a dia.",
+    active: true,
+  },
+  {
+    name: "Moletons",
+    slug: "moletons",
+    description: "Moletons para diferentes estilos e ocasioes.",
+    active: true,
+  },
+  {
+    name: "Calcas",
+    slug: "calcas",
+    description: "Calcas casuais e funcionais.",
+    active: true,
+  },
+  {
+    name: "Jaquetas",
+    slug: "jaquetas",
+    description: "Jaquetas leves para diferentes ocasioes.",
+    active: true,
+  },
+  {
+    name: "Shorts",
+    slug: "shorts",
+    description: "Shorts casuais e esportivos.",
+    active: true,
+  },
+  {
+    name: "Acessorios",
+    slug: "acessorios",
+    description: "Acessorios para complementar o visual.",
+    active: true,
+  },
+  {
+    name: "Meias",
+    slug: "meias",
+    description: "Meias confortaveis para diferentes estilos.",
+    active: true,
+  },
+];
+
 const products = [
   {
     name: "Camiseta Oversized Syntax",
@@ -19,6 +64,7 @@ const products = [
     colors: ["preto", "branco"],
     sizes: ["P", "M", "G", "GG"],
     stock: 35,
+    categorySlug: "camisetas",
   },
   {
     name: "Moletom Code Mode",
@@ -30,6 +76,7 @@ const products = [
     colors: ["preto", "cinza"],
     sizes: ["M", "G", "GG"],
     stock: 20,
+    categorySlug: "moletons",
   },
   {
     name: "Calca Cargo Dev",
@@ -41,6 +88,7 @@ const products = [
     colors: ["preto", "verde militar"],
     sizes: ["38", "40", "42", "44"],
     stock: 18,
+    categorySlug: "calcas",
   },
   {
     name: "Jaqueta Windbreaker",
@@ -52,6 +100,7 @@ const products = [
     colors: ["azul marinho", "preto"],
     sizes: ["P", "M", "G", "GG"],
     stock: 12,
+    categorySlug: "jaquetas",
   },
   {
     name: "Bone Syntax Logo",
@@ -63,6 +112,7 @@ const products = [
     colors: ["preto", "bege"],
     sizes: ["unico"],
     stock: 40,
+    categorySlug: "acessorios",
   },
   {
     name: "Regata Terminal",
@@ -74,6 +124,7 @@ const products = [
     colors: ["branco", "cinza mescla"],
     sizes: ["P", "M", "G"],
     stock: 25,
+    categorySlug: "camisetas",
   },
   {
     name: "Shorts Utility",
@@ -85,6 +136,7 @@ const products = [
     colors: ["preto", "caqui"],
     sizes: ["38", "40", "42", "44"],
     stock: 22,
+    categorySlug: "shorts",
   },
   {
     name: "Cropped Commit",
@@ -96,6 +148,7 @@ const products = [
     colors: ["branco", "rosa"],
     sizes: ["P", "M", "G"],
     stock: 16,
+    categorySlug: "camisetas",
   },
   {
     name: "Meias Stack",
@@ -107,6 +160,7 @@ const products = [
     colors: ["preto", "branco"],
     sizes: ["unico"],
     stock: 60,
+    categorySlug: "meias",
   },
   {
     name: "Bolsa Crossbody Deploy",
@@ -118,34 +172,48 @@ const products = [
     colors: ["preto", "cinza"],
     sizes: ["unico"],
     stock: 14,
+    categorySlug: "acessorios",
   },
 ];
 
 async function main() {
-  const defaultCategory = await prisma.category.upsert({
-    where: { slug: "sem-categoria" },
-    update: {},
-    create: {
-      name: "Sem categoria",
-      slug: "sem-categoria",
-    },
-  });
+  const categoryIds = new Map<string, number>();
+
+  for (const category of categories) {
+    const savedCategory = await prisma.category.upsert({
+      where: { slug: category.slug },
+      update: category,
+      create: category,
+    });
+    categoryIds.set(category.slug, savedCategory.id);
+  }
 
   for (const product of products) {
+    const { categorySlug, ...productData } = product;
+    const categoryId = categoryIds.get(categorySlug);
+
+    if (categoryId === undefined) {
+      throw new Error(
+        `Categoria nao encontrada para o produto ${product.slug}`,
+      );
+    }
+
     await prisma.product.upsert({
       where: { slug: product.slug },
       update: {
-        ...product,
-        category: { connect: { id: defaultCategory.id } },
+        ...productData,
+        category: { connect: { id: categoryId } },
       },
       create: {
-        ...product,
-        category: { connect: { id: defaultCategory.id } },
+        ...productData,
+        category: { connect: { id: categoryId } },
       },
     });
   }
 
-  console.log(`${products.length} produtos inseridos ou atualizados.`);
+  console.log(
+    `${categories.length} categorias e ${products.length} produtos inseridos ou atualizados.`,
+  );
 }
 
 main()

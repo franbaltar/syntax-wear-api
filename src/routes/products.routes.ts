@@ -24,6 +24,7 @@ export default async function productRoutes(fastify: FastifyInstance) {
             minPrice: { type: "number" },
             maxPrice: { type: "number" },
             search: { type: "string" },
+            categoryId: { type: "integer", minimum: 1 },
             sortBy: { type: "string", enum: ["price", "name", "createdAt"] },
             sortOrder: { type: "string", enum: ["asc", "desc"] },
           },
@@ -53,6 +54,7 @@ export default async function productRoutes(fastify: FastifyInstance) {
             properties: {
               id: { type: "number" },
               name: { type: "string" },
+              categoryId: { type: "integer" },
               price: { type: "number" },
               createdAt: { type: "string", format: "date-time" },
               color: { type: "string" },
@@ -96,7 +98,15 @@ export default async function productRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ["Products"],
         description: "Atualiza um produto pelo ID",
-        required: ["name", "description", "price", "slug", "active", "stock"],
+        required: [
+          "name",
+          "description",
+          "price",
+          "slug",
+          "active",
+          "stock",
+          "categoryId",
+        ],
         body: {
           type: "object",
           properties: {
@@ -108,6 +118,7 @@ export default async function productRoutes(fastify: FastifyInstance) {
             stock: { type: "number" },
             active: { type: "boolean" },
             images: { type: "array", items: { type: "string" } },
+            categoryId: { type: "integer", minimum: 1 },
           },
         },
         response: {
@@ -214,6 +225,7 @@ export default async function productRoutes(fastify: FastifyInstance) {
             stock: { type: "number" },
             active: { type: "boolean" },
             images: { type: "array", items: { type: "string" } },
+            categoryId: { type: "integer", minimum: 1 },
           },
         },
       },

@@ -1,5 +1,11 @@
 import z from "zod";
 
+export const categoryFiltersSchema = z.object({
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  search: z.string().optional(),
+});
+
 export const loginSchema = z.object({
   email: z.email("Email inválido"),
   password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
@@ -16,11 +22,31 @@ export const registerSchema = z.object({
 });
 
 export const productFilterSchema = z.object({
-  page: z.number().int().min(1, "Página deve ser no mínimo 1").optional(),
-  limit: z.number().int().min(1, "Limite deve ser no mínimo 1").optional(),
-  minPrice: z.number().min(0, "Preço mínimo deve ser positivo").optional(),
-  maxPrice: z.number().min(0, "Preço máximo deve ser positivo").optional(),
+  page: z.coerce
+    .number()
+    .int()
+    .min(1, "Página deve ser no mínimo 1")
+    .optional(),
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1, "Limite deve ser no mínimo 1")
+    .max(100)
+    .optional(),
+  minPrice: z.coerce
+    .number()
+    .min(0, "Preço mínimo deve ser positivo")
+    .optional(),
+  maxPrice: z.coerce
+    .number()
+    .min(0, "Preço máximo deve ser positivo")
+    .optional(),
   search: z.string().optional(),
+  categoryId: z.coerce
+    .number()
+    .int()
+    .min(1, "ID de categoria inválido")
+    .optional(),
   sortBy: z.enum(["name", "price", "createdAt"]).optional(),
   sortOrder: z.enum(["asc", "desc"]).optional(),
 });
@@ -35,6 +61,7 @@ export const createProductSchema = z.object({
   slug: z.string().min(1, "Slug é obrigatório"),
   active: z.boolean(),
   images: z.array(z.string()).optional(),
+  categoryId: z.number().int().min(1, "ID de categoria inválido"),
 });
 export const updateProductSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório").optional(),
@@ -46,6 +73,7 @@ export const updateProductSchema = z.object({
   slug: z.string().min(1, "Slug é obrigatório").optional(),
   active: z.boolean().optional(),
   images: z.array(z.string()).optional(),
+  categoryId: z.number().int().min(1, "ID de categoria inválido").optional(),
 });
 
 export const deleteProductSchema = z.object({

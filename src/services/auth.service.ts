@@ -51,3 +51,12 @@ export const loginUser = async (data: AuthRequest) => {
 
   return user;
 };
+
+export const getUserRole = async (userId: number) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+
+  return user?.role;
+};

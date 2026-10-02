@@ -10,6 +10,7 @@ import {
 import {
   createProductSchema,
   deleteProductSchema,
+  productFilterSchema,
   updateProductSchema,
 } from "../utils/validators";
 import slugify from "slugify";
@@ -18,7 +19,8 @@ export const listProducts = async (
   request: FastifyRequest<{ Querystring: ProductFilters }>,
   reply: FastifyReply,
 ) => {
-  const result = await getProducts(request.query);
+  const filters = productFilterSchema.parse(request.query);
+  const result = await getProducts(filters);
   reply.status(200).send(result);
 };
 

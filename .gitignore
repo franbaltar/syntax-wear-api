@@ -46,3 +46,5 @@ prisma/migrations/*
 !prisma/migrations/20261002000000_add_categories/migration.sql
 !prisma/migrations/20261002160000_add_product_category_index/
 !prisma/migrations/20261002160000_add_product_category_index/migration.sql
+!prisma/migrations/20261002170000_add_category_product_metadata/
+!prisma/migrations/20261002170000_add_category_product_metadata/migration.sql

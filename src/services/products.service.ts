@@ -34,6 +34,9 @@ export const getProducts = async (filter: ProductFilters) => {
       mode: "insensitive",
     };
   }
+  if (filter.categoryId !== undefined) {
+    where.categoryId = filter.categoryId;
+  }
 
   const result = await prisma.product.findMany({
     where,
@@ -48,6 +51,7 @@ export const getProducts = async (filter: ProductFilters) => {
 export const getProductById = async (id: number) => {
   const product = await prisma.product.findUnique({
     where: { id },
+    include: { category: true },
   });
 
   if (!product) {
@@ -68,8 +72,12 @@ export const createProduct = async (data: CreateProduct) => {
     );
   }
 
+  const { categoryId, ...productData } = data;
   const newProduct = await prisma.product.create({
-    data,
+    data: {
+      ...productData,
+      category: { connect: { id: categoryId } },
+    },
   });
   return newProduct;
 };
@@ -108,9 +116,15 @@ export const updateProduct = async (id: number, data: UpdateProduct) => {
     }
   }
 
+  const { categoryId, ...productData } = data;
   const updatedProduct = await prisma.product.update({
     where: { id },
-    data,
+    data: {
+      ...productData,
+      ...(categoryId !== undefined && {
+        category: { connect: { id: categoryId } },
+      }),
+    },
   });
   return updatedProduct;
 };
